@@ -1,0 +1,12 @@
+# Entorno
+/venvmlops
+
+# Archivos de configuración específicos del entorno
+.env
+
+# Archivos temporales
+*.log
+*.tmp
+
+# Credits.csv
+Dataset/credits.csv
