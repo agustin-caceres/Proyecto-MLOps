@@ -9,4 +9,4 @@
 *.tmp
 
 # Credits.csv
-Dataset/credits.csv
+/Dataset/
