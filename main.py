@@ -144,19 +144,6 @@ def get_actor(nombre_actor: str) -> dict:
     - dict: Diccionario con la cantidad de películas en las que ha participado,
             el retorno total y el retorno promedio por filmación.
             Si no se encuentra el actor, devuelve un mensaje de error.
-    
-    Ejemplo de retorno exitoso:
-    {
-        "actor": "Ben Affleck",
-        "cantidad_filmaciones": 595,
-        "total_retorno": 1973.6386124328706,
-        "promedio_retorno": 3.317039684761127
-    }
-
-    Ejemplo de retorno con error:
-    {
-        "error": "No se encontraron películas para el actor {nombre_actor}"
-    }
     """
     # Filtramos por el nombre del actor
     actor_data = movies_df[movies_df['actor_name'].str.contains(nombre_actor, case=False, na=False)]
