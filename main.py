@@ -87,10 +87,10 @@ def score_titulo(titulo: str) -> dict:
         # Extraemos el año de estreno y el score
         titulo_film = film['title'].values[0]
         año_estreno = film['release_year'].values[0]
-        score = film['vote_average'].values[0]
+        popularity = film['popularity'].values[0]
         
         return {
-            "mensaje": f"La película '{titulo_film}' fue estrenada en el año {año_estreno} con un score de {score}"
+            "mensaje": f"La película '{titulo_film}' fue estrenada en el año {año_estreno} con un score de {popularity}"
         }
     else:
         return {"error": f"No se encontró la película con el título '{titulo}'."}
