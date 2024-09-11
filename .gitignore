@@ -1,5 +1,5 @@
 # Entorno
-/venvmlops
+/mlopsvenv
 
 # Archivos de configuración específicos del entorno
 .env
