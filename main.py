@@ -5,7 +5,7 @@ import pandas as pd
 app = FastAPI()
 
 
-movies_df = pd.read_parquet('C:/DYNAMO/DATA SCIENCE/Proyectos/Proyecto-MLOps/dataset_final.parquet', engine='fastparquet')
+movies_df = pd.read_parquet('dataset_final.parquet', engine='fastparquet')
 
 
 
