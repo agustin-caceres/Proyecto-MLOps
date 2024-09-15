@@ -7,6 +7,8 @@
 # Archivos temporales
 *.log
 *.tmp
+/__pycache__
 
 # Credits.csv
-/Dataset/
+/Datasets/
+ModelML/cosine_sim.npy
