@@ -6,7 +6,10 @@ import pickle
 from sklearn.metrics.pairwise import cosine_similarity
 
 
-app = FastAPI()
+app = FastAPI(
+    title= "Sistema de Recomendación de Películas",
+    description= " La API proporciona recomendaciones de películas basadas en la similitud de contenido. Utiliza TF-IDF y la similitud del coseno para calcular las películas más similares."
+)
 
 
 # Dataset y modelos
@@ -20,6 +23,13 @@ with open('ModelML/tfidf_vectorizer.pkl', 'rb') as f:
  
 # Se calcula la similitud del coseno
 cosine_sim = cosine_similarity(tfidf_matrix, tfidf_matrix)
+
+
+
+
+@app.get("/")
+def read_root():
+    return {"message": "¡Bienvenido al sistema de recomendación de películas!. Inserte /docs en la URL"}
 
 
 
