@@ -1,5 +1,5 @@
 # Entorno
-/mlopsvenv
+/proyectOne
 
 # Archivos de configuración específicos del entorno
 .env
@@ -9,6 +9,6 @@
 *.tmp
 /__pycache__
 
-# Credits.csv
+# Datasets grandes
 /Datasets/
 ModelML/cosine_sim.npy
