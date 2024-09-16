@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 import pickle
 from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.decomposition import TruncatedSVD
 
 
 app = FastAPI(
@@ -16,6 +17,10 @@ app = FastAPI(
 movies_df = pd.read_parquet('Dataset/dataset_final.parquet', engine='fastparquet')
 model_df = pd.read_parquet('ModelML/model_ml.parquet')
 tfidf_matrix = sparse.load_npz('ModelML/tfidf_matrix.npz')
+
+# Se reduce la dimensionalidad de la matriz TF-IDF
+svd = TruncatedSVD(n_components=500) 
+reduced_tfidf_matrix = svd.fit_transform(tfidf_matrix)
 
 # Vectorizador
 with open('ModelML/tfidf_vectorizer.pkl', 'rb') as f:
@@ -47,11 +52,9 @@ def recomendacion(titulo: str, num_recomendaciones: int = 5):
     - dict: Diccionario con la lista de títulos de películas recomendadas o un mensaje de error si el título no se encuentra.
 
     Descripción:
-    La función calcula la similitud del coseno entre la película proporcionada y todas las demás películas
-    en el dataset. En lugar de calcular la similitud para todas las películas en cada inicio del servidor
-    (lo que puede usar mucha memoria), se calcula la similitud de manera dinámica y bajo demanda, cada vez
-    que se realiza una consulta.
-
+    La función utiliza una matriz TF-IDF reducida en dimensionalidad mediante TruncatedSVD para calcular la similitud
+    del coseno de manera eficiente en términos de memoria. El objetivo es reducir el uso de memoria mientras se mantiene 
+    una alta precisión en las recomendaciones.
     """
     # Verificación del título proporcionado en el dataset
     if titulo not in model_df['title'].values:
@@ -60,8 +63,8 @@ def recomendacion(titulo: str, num_recomendaciones: int = 5):
     # Obtención del índice de la película solicitada
     idx = model_df[model_df['title'] == titulo].index[0]
     
-    # Calculo de la similitud del coseno
-    sim_scores = cosine_similarity(tfidf_matrix[idx], tfidf_matrix).flatten()
+    # Calculo de la similitud del coseno con reducción de dimensionalidad de la matriz TF-IDF
+    sim_scores = cosine_similarity(reduced_tfidf_matrix[idx], reduced_tfidf_matrix).flatten()
     
     # Enumera y ordena las similitudes de mayor a menor
     sim_scores = list(enumerate(sim_scores))
