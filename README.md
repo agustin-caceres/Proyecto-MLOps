@@ -1,19 +1,131 @@
-PROYECTO INDIVIDUAL N°1: Machine Learning Operations (MLOps)
+# **👩‍💻** MLops - SISTEMA DE RECOMENDACIÓN DE PELÍCULAS 👩‍💻
 
-Este proyecto consiste en la realización de un pipeline completo de MLOps, que abarca diversas fases del ciclo de vida de un proyecto de ciencia de datos. 
+## 📌 Descripción
 
-Inicia con el procesamiento y transformación de un dataset de películas, desempeñando el rol de Data Engineer, para luego implementar una serie de endpoints mediante una API. Finalmente, se desarrolla un modelo de Machine Learning, específicamente un sistema de recomendación de películas, que será desplegado a través de la API para consultas y recomendaciones en tiempo real.
+Este proyecto consiste en el desarrollo de un sistema de recomendación de películas utilizando **Técnicas de Machine Learning (K-Nearest Neighbors - Cosine Similarity)** , implementado en una **API** desarrollada con **FastAPI** . El proyecto abarca desde la transformación de los datos originales hasta el despliegue de la API en **Render** , donde los usuarios pueden consultar información sobre películas y obtener recomendaciones basadas en similitudes de contenido.
 
-# Desanidado y limpieza de columnas anidadas en formato JSON
+## ⚙️ Funcionalidades
 
-Se procedió con el desanidado de varias columnas de un dataset de películas que contenían listas de diccionarios en formato JSON. El objetivo fue convertir estas listas de diccionarios en nuevas columnas de fácil acceso, permitiendo un análisis más claro y estructurado.
+* **Transformación de Datos** : Procesamiento y limpieza de un dataset de películas, incluyendo el desanidado de diversas columnas y el manejo de valores nulos.
+* **API con FastAPI** : Desarrollada para ofrecer varios endpoints que permiten consultas sobre películas.
+* **Sistema de Recomendación** : Utiliza K-Vecinos basado en la similitud de descripciones para recomendar películas.
+* **Despliegue** : El proyecto está deployado en **Render** y se puede consumir a través de endpoints.
 
-Se realizó el desanidado de las siguientes columnas:
-- `belongs_to_collection`
-- `genres`
-- `production_companies`
-- `production_countries`
-- `spoken_languages`
+## 🧬Estructura del Proyecto
 
-Cada columna fue procesada individualmente para desanidar la información de los diccionarios y convertirlos en nuevas columnas en el DataFrame.
+* **📁 Dataset/** : Contiene el archivo `dataset_final.parquet` con los datos procesados de las películas.
+* **📁 ModelML/** : Incluye los archivos necesarios para el sistema de recomendación (matriz TF-IDF, modelo KNN, etc.).
+* **📁 Notebooks/** : Jupyter Notebooks que documentan el proceso de:
+  * [Extracción, Transformación y Carga de los Datos (ETL)](https://github.com/agustin-caceres/Proyecto-MLOps/blob/main/Notebooks/ETL_movies.ipynb)
+  * [Análisis exploratorio de datos (EDA)](https://github.com/agustin-caceres/Proyecto-MLOps/blob/main/Notebooks/EDA_movies.ipynb)
+  * [Entrenamiento del modelo](https://github.com/agustin-caceres/Proyecto-MLOps/blob/main/Notebooks/Model_training.ipynb)
+  * [Testeo de endpoints](https://github.com/agustin-caceres/Proyecto-MLOps/blob/main/Notebooks/API_testing.ipynb)
+* **📝 main.py** : Archivo principal que define la API con FastAPI.
+* **📄 requirements.txt** : Lista de las dependencias necesarias para correr el proyecto.
 
+## 🛠️ Tecnologías Utilizadas
+
+* **🐍 Python** : Lenguaje principal del proyecto.
+* **🚀 FastAPI** : Framework para el desarrollo de la API.
+* **🔧 scikit-learn** : Para el procesamiento de datos y la implementación del modelo.
+* **🐼 pandas** : Para la manipulación y transformación de los datos.
+* **🌐 Render** : Plataforma de despliegue para la API.
+
+## 💻 Instalación y Ejecución Local
+
+### 🧰 Requisitos
+
+* Python 3.10 o superior.
+* Instalar las dependencias listadas en `requirements.txt`:
+
+```bash
+pip install -r requirements.txt
+```
+
+### ⚡Ejecución Local
+
+1. Clonar el repositorio:
+
+```bash
+git clone https://github.com/agustin-caceres/Proyecto-MLOps.git
+```
+
+2. Navegar al directorio del proyecto:
+
+```bash
+cd Proyecto-MLOps
+```
+
+3. Ejecutar la API localmente usando  **uvicorn** :
+
+```bash
+uvicorn main:app --reload
+```
+
+4. La API estará disponible en:
+
+```bash
+http://127.0.0.1:8000
+```
+
+### 🌐 Endpoints
+
+1️⃣ **GET** `/recomendacion/{titulo}`
+Devuelve una lista de películas similares a la película proporcionada, utilizando K-Vecinos.
+
+**Ejemplo de consulta:**
+
+```bash
+GET /recomendacion/Toy Story
+```
+
+2️⃣ **GET** `/cantidad_filmaciones_mes/{Mes``
+Devuelve la cantidad de filmaciones realizadas en un mes específico (independientemente del año).
+
+**Ejemplo de consulta:**
+
+```bash
+GET /cantidad_filmaciones_mes/Enero
+```
+
+3️⃣ **GET** `/cantidad_filmaciones_dia/{Dia}`
+Devuelve la cantidad de filmaciones realizadas en un día específico de la semana.
+
+**Ejemplo de consulta:**
+
+```bash
+GET /cantidad_filmaciones_dia/Lunes
+```
+
+4️⃣ **GET** `/score_titulo/{titulo_de_la_filmacion}`
+Devuelve el título, fecha de estreno y puntaje de una película específica.
+
+**Ejemplo de consulta:**
+
+```bash
+GET /score_titulo/Toy Story
+```
+
+5️⃣ **GET** `/votos_titulo/{titulo_de_la_filmacion}`
+Devuelve el título, cantidad de votos y el promedio de votos de una película específica.
+
+**Ejemplo de consulta**
+
+```bash
+GET /votos_titulo/Spider-Man
+```
+
+6️⃣ **GET** `/get_actor/{nombre_actor}`
+Devuelve el éxito de un actor medido a través del retorno total y promedio, así como la cantidad de películas en las que ha participado.
+
+**Ejemplo de consulta**
+
+```bash
+GET /get_actor/Tom Cruise
+```
+
+## 🚀 Despliegue en Render
+
+El proyecto ha sido desplegado en **Render** , y puedes acceder a la API a través del siguiente enlace:
+
+[API deployed](https://proyecto-mlops-dp3e.onrender.com)
