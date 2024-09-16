@@ -1,11 +1,63 @@
 from fastapi import FastAPI
+from scipy import sparse
 import pandas as pd
+import numpy as np
+import pickle
+from sklearn.metrics.pairwise import cosine_similarity
 
 
 app = FastAPI()
 
 
-movies_df = pd.read_parquet('dataset_final.parquet', engine='fastparquet')
+# Dataset y modelos
+movies_df = pd.read_parquet('Dataset/dataset_final.parquet', engine='fastparquet')
+model_df = pd.read_parquet('ModelML/model_ml.parquet')
+tfidf_matrix = sparse.load_npz('ModelML/tfidf_matrix.npz')
+
+# Vectorizador
+with open('ModelML/tfidf_vectorizer.pkl', 'rb') as f:
+    tfidf_vectorizer = pickle.load(f)
+ 
+# Se calcula la similitud del coseno
+cosine_sim = cosine_similarity(tfidf_matrix, tfidf_matrix)
+
+
+
+
+@app.get("/recomendacion/{titulo}")
+def recomendacion(titulo: str, num_recomendaciones: int = 5) -> list:
+    """
+    Dada una película, devuelve una lista con los títulos de las películas más similares.
+
+    Parámetros:
+    - titulo (str): El título de la película para la cual se quieren recomendaciones.
+    - num_recomendaciones (int): Número de recomendaciones a devolver. Por defecto es 5.
+
+    Retorna:
+    - list: Lista con los títulos de las películas recomendadas.
+    """
+    
+    # Se verifica si está disponible la película
+    if titulo not in model_df['title'].values:
+        return ["El título no está en el dataset."]
+    
+    # Se obtiene el índice de la película 
+    idx = model_df[model_df['title'] == titulo].index[0]
+    
+    # Se hace el calculo del coseno entre la película y todas las demás
+    sim_scores = list(enumerate(cosine_sim[idx]))
+    
+    # Se ordenan las películas en base a la similitud (de mayor a menor)
+    sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
+    
+    # Se obtiene los índices de las películas más similares, excluyendo la película original
+    sim_scores = sim_scores[1:num_recomendaciones + 1]
+    
+    # Se obtiene las películas más similares
+    movie_indices = [i[0] for i in sim_scores]
+    
+    return model_df['title'].iloc[movie_indices].tolist()
+
 
 
 
@@ -27,7 +79,7 @@ def cantidad_filmaciones_mes(mes: str) -> dict:
         'septiembre': 9, 'octubre': 10, 'noviembre': 11, 'diciembre': 12
     }
     
-    # Convertimos el mes a su número correspondiente
+    # Conversión de mes a su número correspondiente
     mes_numero = meses_diccionario.get(mes.lower())
     
     if mes_numero:
@@ -57,11 +109,11 @@ def cantidad_filmaciones_dia(dia: str) -> dict:
         'viernes': 4, 'sábado': 5, 'domingo': 6
     }
     
-    # Convertimos el día a su número correspondiente
+    # Conversión de día a su número correspondiente
     dia_numero = dias_diccionario.get(dia.lower())
     
     if dia_numero is not None:
-        # Filtramos las películas por el día de la semana del 'release_date'
+        # Filtro de películas por el día de la semana del 'release_date'
         cantidad = movies_df[movies_df['release_date'].dt.dayofweek == dia_numero].shape[0]
         return {"mensaje": f"{cantidad} películas fueron estrenadas el {dia.capitalize()}"}
     else:
@@ -81,11 +133,11 @@ def score_titulo(titulo: str) -> dict:
     Retorno:
     - dict: Mensaje con el título, año de estreno y el score de la película.
     """
-    # Filtramos la película por el título
+    # Filtro de película por el título
     film = movies_df[movies_df['title'].str.lower() == titulo.lower()]
     
     if not film.empty:
-        # Extraemos el año de estreno y el score
+        # Extracción del año de estreno y el score
         titulo_film = film['title'].values[0]
         año_estreno = film['release_year'].values[0]
         popularity = film['popularity'].values[0]
@@ -110,14 +162,14 @@ def votos_titulo(titulo: str) -> dict:
     Retorno:
     - dict: Mensaje con la cantidad de votos y el promedio, o un mensaje si no cumple el mínimo de votos.
     """
-    # Filtramos la película por el título
+    # Filtro de película por el título
     film = movies_df[movies_df['title'].str.lower() == titulo.lower()]
     
     if not film.empty:
         votos = film['vote_count'].values[0]
         promedio_votos = film['vote_average'].values[0]
         
-        # Verificamos si la película tiene al menos 2000 votos
+        # Verificación de película con al menos 2000 votos
         if votos >= 2000:
             return {
                 "mensaje": f"La película '{titulo}' tiene {votos} valoraciones, con un promedio de {promedio_votos}"
@@ -146,10 +198,10 @@ def get_actor(nombre_actor: str) -> dict:
             el retorno total y el retorno promedio por filmación.
             Si no se encuentra el actor, devuelve un mensaje de error.
     """
-    # Filtramos por el nombre del actor
+    # Filtro por el nombre del actor
     actor_data = movies_df[movies_df['actor_name'].str.contains(nombre_actor, case=False, na=False)]
     
-    # Verificamos si se encontraron resultados
+    # Verificación de resultados
     if not actor_data.empty:
         cantidad_filmaciones = actor_data.shape[0]
         total_retorno = actor_data['return'].sum()
