@@ -2,9 +2,7 @@ from fastapi import FastAPI
 from scipy import sparse
 import pandas as pd
 import numpy as np
-import pickle
-from sklearn.metrics.pairwise import cosine_similarity
-from sklearn.decomposition import TruncatedSVD
+from sklearn.neighbors import NearestNeighbors
 
 
 app = FastAPI(
@@ -18,16 +16,10 @@ movies_df = pd.read_parquet('Dataset/dataset_final.parquet', engine='fastparquet
 model_df = pd.read_parquet('ModelML/model_ml.parquet')
 tfidf_matrix = sparse.load_npz('ModelML/tfidf_matrix.npz')
 
-# Se reduce la dimensionalidad de la matriz TF-IDF
-svd = TruncatedSVD(n_components=500) 
-reduced_tfidf_matrix = svd.fit_transform(tfidf_matrix)
 
-# Vectorizador
-with open('ModelML/tfidf_vectorizer.pkl', 'rb') as f:
-    tfidf_vectorizer = pickle.load(f)
- 
-# Se calcula la similitud del coseno
-cosine_sim = cosine_similarity(tfidf_matrix, tfidf_matrix)
+# Se entrena el modelo KNN con la matriz TF-IDF
+knn_model = NearestNeighbors(metric='cosine', algorithm='brute')
+knn_model.fit(tfidf_matrix)
 
 
 
@@ -42,7 +34,7 @@ def read_root():
 @app.get("/recomendacion/{titulo}")
 def recomendacion(titulo: str, num_recomendaciones: int = 5):
     """
-    Devuelve una lista de películas similares a la película proporcionada basadas en la similitud del coseno.
+  Devuelve una lista de películas similares a la película proporcionada usando K-Vecinos.
     
     Parámetros:
     - titulo (str): El título de la película para la cual se quieren obtener recomendaciones.
@@ -52,31 +44,21 @@ def recomendacion(titulo: str, num_recomendaciones: int = 5):
     - dict: Diccionario con la lista de títulos de películas recomendadas o un mensaje de error si el título no se encuentra.
 
     Descripción:
-    La función utiliza una matriz TF-IDF reducida en dimensionalidad mediante TruncatedSVD para calcular la similitud
-    del coseno de manera eficiente en términos de memoria. El objetivo es reducir el uso de memoria mientras se mantiene 
-    una alta precisión en las recomendaciones.
+    La función utiliza el algoritmo K-Nearest Neighbors para encontrar las películas más similares
+    a la película solicitada en base a la similitud de coseno entre las descripciones.
     """
-    # Verificación del título proporcionado en el dataset
+    # Verifica el título proporcionado en el dataset
     if titulo not in model_df['title'].values:
         return {"error": "El título no está en el dataset."}
     
     # Obtención del índice de la película solicitada
     idx = model_df[model_df['title'] == titulo].index[0]
     
-    # Calculo de la similitud del coseno con reducción de dimensionalidad de la matriz TF-IDF
-    sim_scores = cosine_similarity(reduced_tfidf_matrix[idx], reduced_tfidf_matrix).flatten()
+    # Modelo KNN para encontrar los K vecinos más cercanos
+    distances, indices = knn_model.kneighbors(tfidf_matrix[idx], n_neighbors=num_recomendaciones + 1)
     
-    # Enumera y ordena las similitudes de mayor a menor
-    sim_scores = list(enumerate(sim_scores))
-    sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
-    
-    # Selección de películas similares
-    sim_scores = sim_scores[1:num_recomendaciones + 1]
-    
-    # Obtención del índice de las películas recomendadas
-    movie_indices = [i[0] for i in sim_scores]
-    
-    # Obtención de títulos de las películas recomendadas
+    # Obtención de las películas recomendadas (excluyendo la película original)
+    movie_indices = indices.flatten()[1:num_recomendaciones + 1]
     recomendaciones = model_df['title'].iloc[movie_indices].tolist()
     
     return {"recomendaciones": recomendaciones}
