@@ -35,38 +35,48 @@ def read_root():
 
 
 @app.get("/recomendacion/{titulo}")
-def recomendacion(titulo: str, num_recomendaciones: int = 5) -> list:
+def recomendacion(titulo: str, num_recomendaciones: int = 5):
     """
-    Dada una película, devuelve una lista con los títulos de las películas más similares.
-
+    Devuelve una lista de películas similares a la película proporcionada basadas en la similitud del coseno.
+    
     Parámetros:
-    - titulo (str): El título de la película para la cual se quieren recomendaciones.
-    - num_recomendaciones (int): Número de recomendaciones a devolver. Por defecto es 5.
+    - titulo (str): El título de la película para la cual se quieren obtener recomendaciones.
+    - num_recomendaciones (int, opcional): Número de películas a recomendar (por defecto 5).
 
     Retorna:
-    - list: Lista con los títulos de las películas recomendadas.
+    - dict: Diccionario con la lista de títulos de películas recomendadas o un mensaje de error si el título no se encuentra.
+
+    Descripción:
+    La función calcula la similitud del coseno entre la película proporcionada y todas las demás películas
+    en el dataset. En lugar de calcular la similitud para todas las películas en cada inicio del servidor
+    (lo que puede usar mucha memoria), se calcula la similitud de manera dinámica y bajo demanda, cada vez
+    que se realiza una consulta.
+
     """
-    
-    # Se verifica si está disponible la película
+    # Verificación del título proporcionado en el dataset
     if titulo not in model_df['title'].values:
-        return ["El título no está en el dataset."]
+        return {"error": "El título no está en el dataset."}
     
-    # Se obtiene el índice de la película 
+    # Obtención del índice de la película solicitada
     idx = model_df[model_df['title'] == titulo].index[0]
     
-    # Se hace el calculo del coseno entre la película y todas las demás
-    sim_scores = list(enumerate(cosine_sim[idx]))
+    # Calculo de la similitud del coseno
+    sim_scores = cosine_similarity(tfidf_matrix[idx], tfidf_matrix).flatten()
     
-    # Se ordenan las películas en base a la similitud (de mayor a menor)
+    # Enumera y ordena las similitudes de mayor a menor
+    sim_scores = list(enumerate(sim_scores))
     sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
     
-    # Se obtiene los índices de las películas más similares, excluyendo la película original
+    # Selección de películas similares
     sim_scores = sim_scores[1:num_recomendaciones + 1]
     
-    # Se obtiene las películas más similares
+    # Obtención del índice de las películas recomendadas
     movie_indices = [i[0] for i in sim_scores]
     
-    return model_df['title'].iloc[movie_indices].tolist()
+    # Obtención de títulos de las películas recomendadas
+    recomendaciones = model_df['title'].iloc[movie_indices].tolist()
+    
+    return {"recomendaciones": recomendaciones}
 
 
 
