@@ -2,5 +2,7 @@ fastapi==0.114.1
 uvicorn==0.30.6
 pandas==2.2.2
 numpy==2.1.1
-fastparquet==2024.5.0
+scipy==1.14.1
 scikit-learn==1.5.2
+fastparquet==2024.5.0
+pydantic==2.9.1
