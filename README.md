@@ -16,10 +16,10 @@ Este proyecto consiste en el desarrollo de un sistema de recomendación de pelí
 * **📁 Dataset/** : Contiene el archivo `dataset_final.parquet` con los datos procesados de las películas.
 * **📁 ModelML/** : Incluye los archivos necesarios para el sistema de recomendación (matriz TF-IDF, modelo KNN, etc.).
 * **📁 Notebooks/** : Jupyter Notebooks que documentan el proceso de:
-  * [Extracción, Transformación y Carga de los Datos (ETL)](https://github.com/agustin-caceres/Proyecto-MLOps/blob/main/Notebooks/ETL_movies.ipynb)
-  * [Análisis exploratorio de datos (EDA)](https://github.com/agustin-caceres/Proyecto-MLOps/blob/main/Notebooks/EDA_movies.ipynb)
-  * [Entrenamiento del modelo](https://github.com/agustin-caceres/Proyecto-MLOps/blob/main/Notebooks/Model_training.ipynb)
-  * [Testeo de endpoints](https://github.com/agustin-caceres/Proyecto-MLOps/blob/main/Notebooks/API_testing.ipynb)
+  * Extracción, Transformación y Carga de los Datos (ETL) - [Notebook](https://github.com/agustin-caceres/Proyecto-MLOps/blob/main/Notebooks/ETL_movies.ipynb)
+  * Análisis exploratorio de datos (EDA) - [Notebook](https://github.com/agustin-caceres/Proyecto-MLOps/blob/main/Notebooks/EDA_movies.ipynb)
+  * Entrenamiento del modelo - [Notebook](https://github.com/agustin-caceres/Proyecto-MLOps/blob/main/Notebooks/Model_training.ipynb)
+  * Testeo de endpoints - [Notebook](https://github.com/agustin-caceres/Proyecto-MLOps/blob/main/Notebooks/API_testing.ipynb)
 * **📝 main.py** : Archivo principal que define la API con FastAPI.
 * **📄 requirements.txt** : Lista de las dependencias necesarias para correr el proyecto.
 
@@ -128,4 +128,22 @@ GET /get_actor/Tom Cruise
 
 El proyecto ha sido desplegado en **Render** , y puedes acceder a la API a través del siguiente enlace:
 
-[API deployed](https://proyecto-mlops-dp3e.onrender.com)
+- [API deployed](https://proyecto-mlops-dp3e.onrender.com)
+
+## 📞 Contacto
+
+Si tienes alguna pregunta sobre este proyecto o deseas contactarte conmigo, puedes encontrarme en LinkedIn:
+
+- [LinkedIn](https://www.linkedin.com/in/agustincaceres9/?lipi=urn%3Ali%3Apage%3Ad_flagship3_profile_view_base%3BZXoBeymUQzCjeF5HzAKDAA%3D%3D)
+
+## 🎥 Video
+
+Video de presentación del proyecto:
+
+- [Video](https://youtu.be/FHPJ-z_-9II?si=w3CALnuhOBqB-n07)
+
+## 📜 Licencia
+
+Este proyecto está licenciado bajo los términos de la licencia MIT. Para más información, consulta el archivo
+
+- [LICENSE](https://github.com/agustin-caceres/Proyecto-MLOps/blob/main/LICENSE)
